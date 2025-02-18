@@ -210,7 +210,7 @@ export default App
 ## 🎯 **Final Steps**
 1. Start your React app:
    ```sh
-   npm start
+   npm run dev
    ```
 2. You can now:
    - **Add** new users.
