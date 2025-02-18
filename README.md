@@ -20,9 +20,9 @@ MockAPI provides a free online REST API for testing.
 If you don’t have a React app, create one using:
 
 ```sh
-npx create-react-app mockapi-crud
+npm create vite@latest mockapi-crud
 cd mockapi-crud
-npm start
+npm run dev
 ```
 
 ---
