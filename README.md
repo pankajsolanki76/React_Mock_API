@@ -188,23 +188,21 @@ export default EditUser;
 Finally, modify **`App.js`** to include everything.
 
 ```js
-import React, { useState } from "react";
-import UsersList from "./UsersList";
-import AddUser from "./AddUser";
+import './App.css'
+import Studentlist from './Studentlist'
 
-const App = () => {
-  const [reload, setReload] = useState(false);
+function App() {
+  
 
   return (
-    <div>
-      <h1>CRUD with MockAPI</h1>
-      <AddUser onUserAdded={() => setReload(!reload)} />
-      <UsersList key={reload} />
-    </div>
-  );
-};
+    <>
+      <Studentlist/>
+    </>
+  )
+}
 
-export default App;
+export default App
+
 ```
 
 ---
