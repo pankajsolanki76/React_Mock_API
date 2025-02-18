@@ -222,5 +222,4 @@ export default App;
 
 ---
 
-## 🎉 **Congratulations!**
-You’ve successfully built a **React CRUD App** using **MockAPI** with `fetch`. 🚀 Let me know if you need any modifications! 😊
+
