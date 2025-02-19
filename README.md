@@ -27,8 +27,21 @@ npm run dev
 
 ---
 
-## 🔹 **Step 3: Create API Service**
-Inside `src/`, create a file: **`api.js`** to manage API requests.
+
+
+
+
+## 🔹 **Step 3: Install Dependencies**
+Ensure you have **React Router** installed:
+
+```sh
+npm install react-router-dom
+```
+
+---
+
+## 🔹 **Step 4: Setup API Services (`api.js`)**  
+Inside `src/`, create `api.js` to handle API requests.
 
 ```js
 const API_URL = "https://64a8c53000c00b772f32fbd.mockapi.io/users";
@@ -36,6 +49,12 @@ const API_URL = "https://64a8c53000c00b772f32fbd.mockapi.io/users";
 // GET all users
 export const getUsers = async () => {
   const response = await fetch(API_URL);
+  return response.json();
+};
+
+// GET single user
+export const getUserById = async (id) => {
+  const response = await fetch(`${API_URL}/${id}`);
   return response.json();
 };
 
@@ -67,12 +86,42 @@ export const deleteUser = async (id) => {
 
 ---
 
-## 🔹 **Step 4: Fetch and Display Users**
-Create **`UsersList.js`** to display user data.
+## 🔹 **Step 5: Setup Routing (`App.js`)**  
+Modify `App.js` to include routes.
+
+```js
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import UsersList from "./UsersList";
+import AddUser from "./AddUser";
+import EditUser from "./EditUser";
+
+function App() {
+  return (
+    <Router>
+      <div>
+        <h1>User Management</h1>
+        <Routes>
+          <Route path="/" element={<UsersList />} />
+          <Route path="/add" element={<AddUser />} />
+          <Route path="/edit/:id" element={<EditUser />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+```
+
+---
+
+## 🔹 **Step 6: Create User List (`UsersList.js`)**
+Shows users with **Add** & **Edit** buttons.
 
 ```js
 import React, { useEffect, useState } from "react";
 import { getUsers, deleteUser } from "./api";
+import { Link } from "react-router-dom";
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
@@ -88,17 +137,23 @@ const UsersList = () => {
 
   const handleDelete = async (id) => {
     await deleteUser(id);
-    fetchUsers(); // Refresh list after deletion
+    fetchUsers(); // Refresh list
   };
 
   return (
     <div>
       <h2>User List</h2>
+      <Link to="/add">
+        <button>Add User</button>
+      </Link>
       <ul>
         {users.map((user) => (
           <li key={user.id}>
             <img src={user.avatar} alt={user.name} width="50" />
             {user.name} - {user.email}
+            <Link to={`/edit/${user.id}`}>
+              <button>Edit</button>
+            </Link>
             <button onClick={() => handleDelete(user.id)}>Delete</button>
           </li>
         ))}
@@ -112,26 +167,25 @@ export default UsersList;
 
 ---
 
-## 🔹 **Step 5: Add New User Form**
-Create **`AddUser.js`** to add users.
+## 🔹 **Step 7: Add New User (`AddUser.js`)**  
+Handles form submission to add a new user.
 
 ```js
 import React, { useState } from "react";
 import { addUser } from "./api";
+import { useNavigate } from "react-router-dom";
 
-const AddUser = ({ onUserAdded }) => {
+const AddUser = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [avatar, setAvatar] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newUser = { name, email, avatar };
     await addUser(newUser);
-    onUserAdded();
-    setName("");
-    setEmail("");
-    setAvatar("");
+    navigate("/"); // Redirect to user list
   };
 
   return (
@@ -150,30 +204,40 @@ export default AddUser;
 
 ---
 
-## 🔹 **Step 6: Edit User**
-Create **`EditUser.js`** for updating users.
+## 🔹 **Step 8: Edit User (`EditUser.js`)**  
+Fetches the selected user and updates the details.
 
 ```js
-import React, { useState } from "react";
-import { updateUser } from "./api";
+import React, { useEffect, useState } from "react";
+import { getUserById, updateUser } from "./api";
+import { useNavigate, useParams } from "react-router-dom";
 
-const EditUser = ({ user, onUserUpdated }) => {
-  const [name, setName] = useState(user.name);
-  const [email, setEmail] = useState(user.email);
-  const [avatar, setAvatar] = useState(user.avatar);
+const EditUser = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [user, setUser] = useState({ name: "", email: "", avatar: "" });
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
+    const data = await getUserById(id);
+    setUser(data);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await updateUser(user.id, { name, email, avatar });
-    onUserUpdated();
+    await updateUser(id, user);
+    navigate("/");
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <h2>Edit User</h2>
-      <input value={name} onChange={(e) => setName(e.target.value)} required />
-      <input value={email} onChange={(e) => setEmail(e.target.value)} required />
-      <input value={avatar} onChange={(e) => setAvatar(e.target.value)} required />
+      <input value={user.name} onChange={(e) => setUser({ ...user, name: e.target.value })} required />
+      <input value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} required />
+      <input value={user.avatar} onChange={(e) => setUser({ ...user, avatar: e.target.value })} required />
       <button type="submit">Update User</button>
     </form>
   );
@@ -184,40 +248,30 @@ export default EditUser;
 
 ---
 
-## 🔹 **Step 7: Connect Components in `App.js`**
-Finally, modify **`App.js`** to include everything.
-
-```js
-import './App.css'
-import Studentlist from './Studentlist'
-
-function App() {
-  
-
-  return (
-    <>
-      <Studentlist/>
-    </>
-  )
-}
-
-export default App
-
+## 🔹 **Final Steps**
+### ✅ Run Your App:
+```sh
+npm run dev
 ```
 
----
 
-## 🎯 **Final Steps**
-1. Start your React app:
-   ```sh
-   npm run dev
-   ```
-2. You can now:
-   - **Add** new users.
-   - **View** users.
-   - **Delete** users.
-   - **Edit** users.
 
----
+
+
+## 🎯 **Project Folder Structure**
+```
+mockapi-crud/
+│── src/
+│   ├── api.js
+│   ├── App.js
+│   ├── UsersList.js
+│   ├── AddUser.js
+│   ├── EditUser.js
+│   ├── index.css
+│   └── main.jsx
+└── public/
+```
+
+
 
 
