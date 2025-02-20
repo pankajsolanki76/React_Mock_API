@@ -85,6 +85,33 @@ export const deleteUser = async (id) => {
 ```
 
 ---
+## 🔹 **Step 5: Setup Routing (`App.js`)**  
+Modify `App.js` to include routes.
+
+```js
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import UsersList from "./UsersList";
+import AddUser from "./AddUser";
+import EditUser from "./EditUser";
+
+function App() {
+  return (
+    <Router>
+      <div>
+        <h1>User Management</h1>
+        <Routes>
+          <Route path="/" element={<UsersList />} />
+          <Route path="/add" element={<AddUser />} />
+          <Route path="/edit/:id" element={<EditUser />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+```
+
 
 
 ---
